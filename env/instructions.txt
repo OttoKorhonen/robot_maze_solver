@@ -1,0 +1,9 @@
+Help the friendly robot (🤖) find it's way home? The rules are following
+
+    Count how many steps it takes to reach (E)
+    Robot starts at character S
+    Starting direction is always up
+    If the robot is about to hit an obstacle, it should turn right before it and move forward.
+    If the robot enters into S character after the start, treat S as a dot, so count it as a step.
+    (E) character is counted as step
+    Make a note of the MAP_CODE in the first line, you'll need it in answer

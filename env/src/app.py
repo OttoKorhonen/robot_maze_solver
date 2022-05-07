@@ -1,5 +1,6 @@
 from time import sleep
 
+
 class Robot():
 
     def __init__(self, map: str):
@@ -24,14 +25,14 @@ class Robot():
             map = map.write()
 
     # muuttaa robotin kulkemaa suuntaa
-    def change_direction(self, direction:str):
+    def change_direction(self, direction: str):
         if direction == 'up':
             self.direction = 'right'
-        if direction == 'right':
+        elif direction == 'right':
             self.direction = 'down'
-        if direction == 'down':
+        elif direction == 'down':
             self.direction = 'left'
-        if direction == 'left':
+        elif direction == 'left':
             self.direction = 'up'
 
     # funktio etsii kartasta aloituspaikan ja palauttaa sen tuplena
@@ -42,6 +43,7 @@ class Robot():
                 for marking in line:
                     if marking == 'S':
                         self.position = map.index(line), line.index(marking)
+                        print('Position located!')
                         return map.index(line), line.index(marking)
         except:
             raise ValueError('Start position could not be found')
@@ -53,68 +55,62 @@ class Robot():
             for line in map:
                 for marking in line:
                     if marking == 'E':
+                        print('Exit located!')
                         return map.index(line), line.index(marking)
         except:
             raise ValueError('Exit could not be found')
 
     def count_steps(self):
-        self.steps = self.steps + 1
+        self.steps += 1
 
-    def take_step(self, direction: str):
+    def take_step(self, direction: str, map):
+        y, x, obj = self.move_to(direction, map)
+
+        if obj != '#':
+            self.tile = map[y][x]
+            self.position = y, x
+            self.count_steps()
+        else:
+            self.change_direction(direction)
+
+    def move_to(self, direction: str, map):
+        y, x = self.position
+
         if direction == 'up':
-            y = list(self.position)
-            y[0] = self.position[0] - 1
-            self.position = tuple(y)
-        if direction == 'right':
-            x = list(self.position)
-            x[1] = self.position[1] + 1
-            self.position = tuple(x)
-        if direction == 'down':
-            y = list(self.position)
-            y[0] = self.position[0] + 1
-            self.position = tuple(y)
-        if direction == 'left':
-            x = list(self.position)
-            x[1] = self.position[1] - 1
-            self.position = tuple(x)
+            y -= 1
+        elif direction == 'down':
+            y += 1
+        elif direction == 'left':
+            x -= 1
+        elif direction == 'right':
+            x += 1
+        else:
+            raise ValueError(f'Direction error: Direction {direction}')
 
-    
-    def hash(self, map:str):
-        position = self.position
-        if self.direction == 'up' and map[position[0]-1][position[1]] == '#' or self.direction == 'right' and map[position[0]][position[1]+1] == '#' or self.direction == 'down' and map[position[0]+1][position[1]] == '#' or self.direction == 'left' and map[position[0]][position[1]-1] == '#':
-            return True
-
+        return y, x, map[y][x]
 
     def get_out(self):
-        start = self.find_start()
+        start_x, start_y = self.find_start()
         map = self.read_map()
-        self.tile = map[start[0]][start[1]]
-        exit = self.find_exit()
-        
+        self.tile = map[start_x][start_y]
+        self.find_exit()
+
+        print('Processing...(🤖)')
+
         while True:
             sleep(0.1)
-            print(self, exit)
-            self.take_step(self.direction)
-            self.count_steps()
-            if self.hash(map):
-                self.change_direction(self.direction)
-            # if self.tile == '#':
-            #     self.change_direction(self.direction)
-                
+            self.take_step(self.direction, map)
+
             if self.tile == 'E':
                 break
-            # if self.position == self.find_exit:
-            #     print(self.steps)
-            #     break
-                
 
-            self.tile = map[self.position[0]][self.position[1]]
-        
-        print(f'Robotin askeleet: {self.steps}')
+        print(f'It took {self.steps} for the (🤖) to get out')
         return self.steps
 
+
 if __name__ == '__main__':
-    robot = Robot('map_4597926.txt')
+    robot = Robot('map_1637284.txt')
+    #robot = Robot('map_4597926.txt')
     #robot = Robot('map_4159889.txt')
     #robot = Robot('map_2701837.txt')
     #robot = Robot('test_map.txt')
